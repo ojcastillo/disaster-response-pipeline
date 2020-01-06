@@ -30,8 +30,9 @@ def clean_data(df):
         # Set each value to be the last character of the string
         categories[column] = categories[column].str.split('-').str[1]
 
-        # Convert column from string to numeric
-        categories[column] = categories[column].astype(int)
+        # Convert column from string to numeric, converting to bool in the middle so anything larger
+        # than 0 is considered as 1
+        categories[column] = categories[column].astype(int).astype(bool).astype(int)
 
     # Drop the original categories column from `df`
     new_df = df.drop('categories', axis=1)
