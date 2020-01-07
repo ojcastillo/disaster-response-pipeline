@@ -8,3 +8,6 @@ conda activate disaster
 
 echo "Installing dependencies into disaster env"
 pip install -r requirements.txt
+
+echo "Downloading nltk dependencies"
+python -c "import nltk; nltk.download(['punkt', 'wordnet'])"
