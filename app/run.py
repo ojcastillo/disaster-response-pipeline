@@ -39,12 +39,17 @@ model = joblib.load("../models/classifier.pkl")
 def index():
 
     # extract data needed for visuals
-    # TODO: Below is an example - modify to extract data for your own visuals
     genre_counts = df.groupby('genre').count()['message']
     genre_names = list(genre_counts.index)
 
+    category_melt = pd.melt(df, id_vars=['id', 'message', 'original', 'genre'], var_name='category')
+    category_counts = category_melt.groupby('category').sum()['value']
+    category_names = list(category_counts.index)
+
+    df['message_len'] = df.message.str.len()
+    message_lens = df['message_len']
+
     # create visuals
-    # TODO: Below is an example - modify to create your own visuals
     graphs = [
         {
             'data': [
@@ -53,7 +58,6 @@ def index():
                     y=genre_counts
                 )
             ],
-
             'layout': {
                 'title': 'Distribution of Message Genres',
                 'yaxis': {
@@ -61,9 +65,39 @@ def index():
                 },
                 'xaxis': {
                     'title': "Genre"
-                }
+                },
             }
-        }
+        },
+        {
+            'data': [
+                Bar(
+                    x=category_names,
+                    y=category_counts
+                )
+            ],
+            'layout': {
+                'title': 'Distribution of Message Categories',
+                'yaxis': {
+                    'title': "Count"
+                },
+                'xaxis': {
+                    'title': "Category",
+                    'tickangle': -45,
+                },
+            }
+        },
+        {
+            'data': [{
+                'type': 'histogram',
+                'x': message_lens,
+            }],
+            'layout': {
+                'title': 'Histogram of Message Lengths',
+                'yaxis': {
+                    'title': "Count"
+                },
+            }
+        },
     ]
 
     # encode plotly graphs in JSON
