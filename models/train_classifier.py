@@ -7,7 +7,7 @@ import pickle
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.feature_extraction.text import CountVectorizer, TfidfTransformer
 from sklearn.metrics import accuracy_score, classification_report
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import GridSearchCV, train_test_split
 from sklearn.multiclass import OneVsRestClassifier
 from sklearn.pipeline import Pipeline
 from sqlalchemy import create_engine
@@ -25,7 +25,7 @@ def load_data(database_filepath):
 def tokenize(text):
     """Use Twitter aware casual tokenizer followed by WordNetLemmatizer on extracted tokens"""
 
-    # Implementation of casual_tokenize can be at: www.nltk.org/_modules/nltk/tokenize/casual.html
+    # Implementation of casual_tokenize at www.nltk.org/_modules/nltk/tokenize/casual.html
     tokens = casual_tokenize(text.lower())
 
     lemmatizer = WordNetLemmatizer()
@@ -38,17 +38,22 @@ def tokenize(text):
 
 def build_model():
     """Build model pipeline"""
-    return Pipeline([
+    pipe = Pipeline([
         ('vect', CountVectorizer(tokenizer=tokenize, ngram_range=(1, 2))),
         ('tfidf', TfidfTransformer(use_idf=False)),
-        ('clf', OneVsRestClassifier(RandomForestClassifier(), n_jobs=-1)),
+        ('clf', OneVsRestClassifier(RandomForestClassifier(n_jobs=-1), n_jobs=-1)),
     ])
-
+    parameters = {
+        'clf__estimator__n_estimators': [40, 80],
+        'clf__estimator__min_samples_split': [2, 4],
+    }
+    return GridSearchCV(pipe, param_grid=parameters)
 
 
 def evaluate_model(model, X_test, Y_test, category_names):
     """Print a report with model accuracy, precision, recall and f1-score"""
     Y_pred = model.predict(X_test)
+    print("Best model parameters:", model.best_params_)
     print("Model Accuracy:", accuracy_score(Y_test, Y_pred))
     print("Classification report per category:")
     print(classification_report(Y_test, Y_pred, target_names=category_names))

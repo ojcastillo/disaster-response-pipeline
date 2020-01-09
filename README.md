@@ -44,7 +44,7 @@ Running the following command will set up a `conda` environment automatically, a
 
     - To run ETL pipeline that cleans data and stores in database
         `python data/process_data.py data/disaster_messages.csv data/disaster_categories.csv data/DisasterResponse.db`
-    - To run ML pipeline that trains classifier and saves
+    - To run ML pipeline that trains classifier and saves (on 2015 MacBook Pro, this took 30mins and slowed down the system quite a bit)
         `python models/train_classifier.py data/DisasterResponse.db models/classifier.pkl`
 
 2. Run the following command in the app's directory to run your web app.
